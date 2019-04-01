@@ -59,7 +59,7 @@ object Object {
  def myIdentity[A](a: A): A = a
   def testList = List("1", "2", "3").traverse(parseInt)
   def testList2 = List("1", "2", "CDE").traverse(parseInt)
-  def testList3 = List("1", "2", "3").sequence
+  // def testList3 = List("1", "2", "3").sequence
   def futureList = List(Future(1), Future(2), Future(3))
 
   //def parseFutureInt(i: Future[Int]): Int = i.
