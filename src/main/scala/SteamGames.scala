@@ -1,6 +1,25 @@
 package notes
 
 object SteamGames {
+  sealed trait Predicate {
+    def evaluate: Boolean = this match {
+      case AverageScoreMoreThan(g,d) => g.averageScore > d
+      case PriceMoreThan(g,d) => g.price > d
+      case NonEmptyTitle(g) => g.title.nonEmpty
+      case GenreIn(g, genres) => genres.contains(g.genre)
+      case RatingIn(g, ratings) => ratings.contains(g.rating)
+      case And(a,b) => a.evaluate && b.evaluate
+      case Or(a,b) => a.evaluate || b.evaluate
+    }
+  }
+  final case class AverageScoreMoreThan(g: Game, d: Double) extends Predicate
+  final case class PriceMoreThan(g: Game, d: Double) extends Predicate
+  final case class NonEmptyTitle(g: Game) extends Predicate
+  final case class GenreIn(g: Game, genres: List[Genre]) extends Predicate
+  final case class RatingIn(g: Game, ratings: List[Rating]) extends Predicate
+  final case class And(a: Predicate, b: Predicate) extends Predicate
+  final case class Or(a: Predicate, b: Predicate) extends Predicate
+
   final case class Review(score: Int, reviewText: String)
 
   sealed trait SearchableKey

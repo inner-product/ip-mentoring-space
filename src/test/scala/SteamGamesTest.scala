@@ -4,6 +4,7 @@ import notes.ObjectTestSuite.{assert, test}
 import notes.SteamGames.Review
 
 object SteamGamesTest extends SimpleTestSuite {
+  import SteamGames._
   test("create steam game") {
     val spaceShooter = SteamGames.Game("Space Shooter",
       "This is a game where you shoot stuff in space",
@@ -72,5 +73,15 @@ object SteamGamesTest extends SimpleTestSuite {
       9.99,
       reviewList)
     assert(spaceShooter.averageScore == 6.5)
+  }
+  test("steam game with non empty title and price greater than 5") {
+    val reviewList = List.empty[Review]
+    val game = SteamGames.Game("Space Shooter",
+      "This is a game where you shoot stuff in space",
+      SteamGames.Action(),
+      SteamGames.PG(),
+      9.99,
+      reviewList)
+    assert(And(NonEmptyTitle(game), PriceMoreThan(game, 5)).evaluate)
   }
 }
