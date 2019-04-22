@@ -8,9 +8,9 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object ChurchEncoding {
-  sealed trait Expr[T]
-  case class Lit[T](value: T) extends Expr[T]
-  case class GreaterThan(value1: Int, value2: Int) extends Expr[Boolean]
+  //sealed trait Expr[T]
+  //case class Lit[T](value: T) extends Expr[T]
+  //case class GreaterThan(value1: Int, value2: Int) extends Expr[Boolean]
 
 
   sealed trait Expr_DSL[F[_]] {
@@ -34,7 +34,22 @@ object ChurchEncoding {
     import expr._
     greaterThan(1, 3)
   }
-
+  def program2[F[_]: Monad](expr: Expr_DSL[F]): F[Boolean] = {
+    import expr._
+    for {
+      a <- lit(1)
+      b <- lit(3)
+      gt <- greaterThan(a, b)
+    } yield gt
+  }
+  def program3[F[_]](expr: Expr_DSL[F])(implicit m: Monad[F]): F[Boolean] = {
+    import expr._
+    for {
+      a <- lit(1)
+      b <- lit(3)
+      gt <- greaterThan(a, b)
+    } yield gt
+  }
   object AsyncInterpreter extends Expr_DSL[Future] {
     def lit[T](value: T): Future[T] = {
       Future(value)
