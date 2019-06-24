@@ -1,5 +1,8 @@
 package notes
 
+import cats.implicits._
+import cats.data._
+
 object SteamGames {
   sealed trait Predicate {
     def evaluate: Boolean = this match {
@@ -46,6 +49,26 @@ object SteamGames {
         case _ =>
           computeTotalScore(reviews) / reviews.length
       }
+    }
+  }
+
+  object Game {
+    def validateDouble(d: Double, min: Double) : Boolean = {
+      d >= min
+    }
+    def validateStringLength(str: String, maxLength: Int): Boolean = {
+      str.length <= maxLength
+    }
+    def validateGame(g: Game) : cats.data.ValidatedNel[String, Game] = {
+      /*
+      (validateDouble(g.price, 0), validateStringLength(g.description, 1000)).mapN(
+        g
+      )
+      */
+      cats.data.Validated.valid(g)
+        .toValidatedNel
+        .ensure(NonEmptyList.one("price is not negative"))(g => validateDouble(g.price, 0))
+        .ensure(NonEmptyList.one("description is less than or equal to 20 characters"))(g => validateStringLength(g.description, 20))
     }
   }
 

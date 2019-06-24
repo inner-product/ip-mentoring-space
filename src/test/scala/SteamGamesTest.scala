@@ -2,6 +2,8 @@ package notes
 import minitest._
 import notes.ObjectTestSuite.{assert, test}
 import notes.SteamGames.Review
+import cats.implicits._
+import cats.data._
 
 object SteamGamesTest extends SimpleTestSuite {
   import SteamGames._
@@ -83,5 +85,38 @@ object SteamGamesTest extends SimpleTestSuite {
       9.99,
       reviewList)
     assert(And(NonEmptyTitle(game), PriceMoreThan(game, 5)).evaluate)
+  }
+  test("steam game with price less than 0") {
+    val reviewList = List.empty[Review]
+    val game = SteamGames.Game("Space Shooter",
+      "This is a game",
+      SteamGames.Action(),
+      SteamGames.PG(),
+      -1.0,
+      reviewList)
+    val validation = Game.validateGame(game)
+    assertEquals(validation, cats.data.Validated.invalid(NonEmptyList.one("price is not negative")))
+  }
+  test("steam game with description length greater than 20") {
+    val reviewList = List.empty[Review]
+    val game = SteamGames.Game("Space Shooter",
+      "This is a game where you shoot stuff in space",
+      SteamGames.Action(),
+      SteamGames.PG(),
+      1,
+      reviewList)
+    val validation = Game.validateGame(game)
+    assertEquals(validation, cats.data.Validated.invalid(NonEmptyList.one("description is less than or equal to 20 characters")))
+  }
+  test("steam game with both errors") {
+    val reviewList = List.empty[Review]
+    val game = SteamGames.Game("Space Shooter",
+      "This is a game where you shoot stuff in space",
+      SteamGames.Action(),
+      SteamGames.PG(),
+      -1,
+      reviewList)
+    val validation = Game.validateGame(game)
+    assertEquals(validation, cats.data.Validated.invalid(NonEmptyList.one("price is not negative")))
   }
 }
